@@ -10,6 +10,8 @@ import os
 load_dotenv()
 
 from routers.notices import router as notices_router
+from routers.gallery import router as gallery_router
+from routers.folders import router as folders_router
 
 MONGO_URL = os.environ["MONGO_URL"]
 MONGO_DB = os.environ["MONGO_DB"]
@@ -19,8 +21,11 @@ MONGO_DB = os.environ["MONGO_DB"]
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     client = AsyncIOMotorClient(MONGO_URL)
     app.state.db = client[MONGO_DB]
-    # Ensure index on the notices collection
+    # Ensure indexes
     await app.state.db["news"].create_index("id", unique=True)
+    await app.state.db["gallery"].create_index("id", unique=True)
+    await app.state.db["gallery_folders"].create_index("id", unique=True)
+    await app.state.db["gallery_folders"].create_index("slug", unique=True)
     yield
     client.close()
 
@@ -41,6 +46,8 @@ app.add_middleware(
 )
 
 app.include_router(notices_router)
+app.include_router(gallery_router)
+app.include_router(folders_router)
 
 
 @app.get("/health")
