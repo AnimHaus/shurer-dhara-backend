@@ -12,6 +12,8 @@ load_dotenv()
 from routers.notices import router as notices_router
 from routers.gallery import router as gallery_router
 from routers.folders import router as folders_router
+from routers.auth import router as auth_router
+from routers.analytics import router as analytics_router
 
 MONGO_URL = os.environ["MONGO_URL"]
 MONGO_DB = os.environ["MONGO_DB"]
@@ -48,6 +50,8 @@ app.add_middleware(
 app.include_router(notices_router)
 app.include_router(gallery_router)
 app.include_router(folders_router)
+app.include_router(auth_router)
+app.include_router(analytics_router)
 
 
 @app.get("/health")
