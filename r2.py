@@ -50,3 +50,21 @@ def delete_image(key: str) -> None:
         _get_client().delete_object(Bucket=BUCKET(), Key=key)
     except Exception:
         pass
+
+
+BG_AUDIO_KEY = "bg-audio/bg-audio.mp3"
+
+def upload_audio(file_bytes: bytes) -> str:
+    """Upload audio bytes to the fixed bg-audio key. Returns the public URL."""
+    _get_client().put_object(
+        Bucket=BUCKET(),
+        Key=BG_AUDIO_KEY,
+        Body=file_bytes,
+        ContentType="audio/mpeg",
+    )
+    return f"{CDN_BASE()}/{BG_AUDIO_KEY}"
+
+
+def get_audio_url() -> str:
+    """Return the public URL for the background audio file."""
+    return f"{CDN_BASE()}/{BG_AUDIO_KEY}"

@@ -142,6 +142,7 @@ async def create_gallery_image(
         title=data.title,
         caption=data.caption,
         category=data.category,
+        year=data.year,
         order=data.order,
         active=data.active,
         url=url,

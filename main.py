@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,11 +10,17 @@ import os
 
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+
 from routers.notices import router as notices_router
 from routers.gallery import router as gallery_router
 from routers.folders import router as folders_router
 from routers.auth import router as auth_router
 from routers.analytics import router as analytics_router
+from routers.bg_audio import router as bg_audio_router
 
 MONGO_URL = os.environ["MONGO_URL"]
 MONGO_DB = os.environ["MONGO_DB"]
@@ -52,6 +59,7 @@ app.include_router(gallery_router)
 app.include_router(folders_router)
 app.include_router(auth_router)
 app.include_router(analytics_router)
+app.include_router(bg_audio_router)
 
 
 @app.get("/health")

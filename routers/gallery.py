@@ -28,6 +28,7 @@ async def upload_image(
     title: str = Form(...),
     caption: Optional[str] = Form(None),
     category: str = Form("general"),
+    year: Optional[str] = Form(None),
     order: int = Form(0),
     active: bool = Form(True),
 ):
@@ -41,6 +42,7 @@ async def upload_image(
         title=title,
         caption=caption,
         category=category,
+        year=year,
         order=order,
         active=active,
     )

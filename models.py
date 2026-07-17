@@ -49,6 +49,7 @@ class GalleryImage(BaseModel):
     title: str
     caption: Optional[str] = None
     category: str = "general"
+    year: Optional[str] = None       # e.g. "2024" — for timeline filtering
     url: str          # CDN / R2 public URL
     key: str          # R2 object key (for deletion)
     order: int = 0
@@ -61,6 +62,7 @@ class GalleryImageCreate(BaseModel):
     title: str
     caption: Optional[str] = None
     category: str = "general"
+    year: Optional[str] = None
     order: int = 0
     active: bool = True
 
@@ -69,6 +71,7 @@ class GalleryImageUpdate(BaseModel):
     title: Optional[str] = None
     caption: Optional[str] = None
     category: Optional[str] = None
+    year: Optional[str] = None
     order: Optional[int] = None
     active: Optional[bool] = None
 
