@@ -245,3 +245,31 @@ async def update_folder(db: AsyncIOMotorDatabase, folder_id: str, data: GalleryF
 async def delete_folder(db: AsyncIOMotorDatabase, folder_id: str) -> bool:
     result = await _folder_col(db).delete_one({"id": folder_id})
     return result.deleted_count > 0
+
+
+# ─── Settings / Background Audio ─────────────────────────────────────────────
+
+def _settings_col(db: AsyncIOMotorDatabase):
+    return db["settings"]
+
+
+async def get_bg_audio_settings(db: AsyncIOMotorDatabase) -> dict:
+    doc = await _settings_col(db).find_one({"key": "bg_audio"})
+    volume = 0.5
+    if doc and "volume" in doc:
+        try:
+            volume = float(doc["volume"])
+        except (ValueError, TypeError):
+            volume = 0.5
+    return {"volume": volume}
+
+
+async def update_bg_audio_volume(db: AsyncIOMotorDatabase, volume: float) -> dict:
+    vol = round(max(0.0, min(1.0, volume)), 2)
+    await _settings_col(db).update_one(
+        {"key": "bg_audio"},
+        {"$set": {"key": "bg_audio", "volume": vol, "updatedAt": _now()}},
+        upsert=True,
+    )
+    return {"volume": vol}
+

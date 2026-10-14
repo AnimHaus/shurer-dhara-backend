@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Request
+from pydantic import BaseModel, Field
 import r2
+import store
 
 router = APIRouter(prefix="/api/bg-audio", tags=["bg-audio"])
 
@@ -7,10 +9,29 @@ _ALLOWED_TYPES = {"audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/fl
 _MAX_SIZE = 50 * 1024 * 1024  # 50 MB
 
 
+class VolumeUpdate(BaseModel):
+    volume: float = Field(..., ge=0.0, le=1.0)
+
+
 @router.get("")
-def get_audio_url():
-    """Return the current background audio public URL."""
-    return {"url": r2.get_audio_url()}
+async def get_audio_info(request: Request):
+    """Return the current background audio public URL and volume level."""
+    db = getattr(request.app.state, "db", None)
+    volume = 0.5
+    if db is not None:
+        settings = await store.get_bg_audio_settings(db)
+        volume = settings.get("volume", 0.5)
+    return {"url": r2.get_audio_url(), "volume": volume}
+
+
+@router.patch("/volume")
+async def update_audio_volume(data: VolumeUpdate, request: Request):
+    """Update background audio default volume (0.0 to 1.0)."""
+    db = getattr(request.app.state, "db", None)
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    res = await store.update_bg_audio_volume(db, data.volume)
+    return {"volume": res["volume"], "message": "Volume updated successfully."}
 
 
 @router.post("/upload")
